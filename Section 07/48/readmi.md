@@ -1,0 +1,1 @@
+What is ORM and why orm used in applications deevlopment
