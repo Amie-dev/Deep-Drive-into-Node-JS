@@ -1,6 +1,6 @@
 import { db } from "../db/index.js";
 import { booksTable, authorsTable } from "../model/index.js"; // Make sure this path is correct
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 export const addNewBook = async (req, res) => {
     const { title, descriptions, authorId } = req.body;
@@ -19,6 +19,12 @@ export const addNewBook = async (req, res) => {
 };
 
 export const getAllBooks = async (req, res) => {
+    const search=req.query.search
+    //book?search=
+    if (search) {
+        const book=await db.select().from(booksTable).where(sql`to_tsvector('english',${booksTable.title}) @@ to_tsquery('english',${search})`)
+       return res.status(200).json(book);
+    }
     try {
         const books = await db.select().from(booksTable);
         res.status(200).json(books);
@@ -31,7 +37,7 @@ export const getBookById = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const book = await db.select().from(booksTable).where(eq(booksTable.id,id));
+        const book = await db.select().from(booksTable).where(eq(booksTable.id,id)).leftJoin(authorsTable,eq(booksTable.authorId,authorsTable.id));
         if (book.length === 0) {
             return res.status(404).json({ error: "Book not found" });
         }
