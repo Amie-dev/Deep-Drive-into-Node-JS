@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres
+    ports:
+      - '5432:5432'   # Host port 5432 mapped to container's 5432
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - 'db_data:/var/lib/postgresql/db_data'
+
+volumes:
+  db_data:
