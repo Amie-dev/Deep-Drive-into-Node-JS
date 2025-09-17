@@ -4,6 +4,7 @@ import { db } from '../db/index.js';
 import { urlTable } from '../model/url.model.js';
 import { and, eq } from 'drizzle-orm';
 import { userTable } from '../model/user.model.js';
+import { qrcode } from '../utils/qrUrl.js';
 
 
 export const shorten=async(req,res)=>{
@@ -16,6 +17,12 @@ export const shorten=async(req,res)=>{
       const { targetUrl,code} = validationsResult.data;
 
       const shortCode=code ?? nanoid(6);
+
+      //
+
+      const result=await qrcode(targetUrl,shortCode)
+      console.log(result.filePath);
+      
 
       const [shortenUrl]=await db.insert(urlTable).values({
         targetUrl,
